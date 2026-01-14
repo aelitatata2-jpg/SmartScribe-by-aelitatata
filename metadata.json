@@ -1,0 +1,7 @@
+{
+  "name": "Smart Scribe by aelitatata",
+  "description": "A sophisticated tool for transcribing audio or processing text into professional meeting minutes with a customizable UI and Google Drive integration.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
