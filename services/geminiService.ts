@@ -6,29 +6,27 @@ export async function processMeetingData(
   inputData: string | File,
   systemPrompt: string
 ): Promise<string> {
-  const apiKey = process.env.API_KEY || (import.meta as any).env.VITE_GEMINI_API_KEY;
+  // Согласно правилам, используем исключительно process.env.API_KEY
+  const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY.");
+    throw new Error("API Key is missing.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  
-  // Use Gemini 3 Flash for efficiency and multimodal support
   const model = 'gemini-3-flash-preview';
 
   try {
     if (inputType === 'TEXT') {
       const response = await ai.models.generateContent({
         model,
-        contents: `Input Data:\n${inputData as string}`,
+        contents: `Данные для анализа:\n${inputData as string}`,
         config: {
           systemInstruction: systemPrompt,
           temperature: 0.7,
         },
       });
-      return response.text || "No response generated.";
+      return response.text || "Не удалось сгенерировать ответ.";
     } else {
-      // Handle Audio
       const audioFile = inputData as File;
       const base64Data = await fileToBase64(audioFile);
       
@@ -43,7 +41,7 @@ export async function processMeetingData(
               },
             },
             {
-              text: "Please transcribe this meeting audio and generate minutes according to your instructions.",
+              text: "Пожалуйста, проанализируй это аудио и составь протокол встречи согласно системной инструкции.",
             },
           ],
         },
@@ -52,11 +50,11 @@ export async function processMeetingData(
           temperature: 0.7,
         },
       });
-      return response.text || "No response generated from audio.";
+      return response.text || "Не удалось обработать аудио.";
     }
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    throw new Error(error.message || "Failed to process data with Gemini AI.");
+    throw new Error(error.message || "Ошибка при работе с ИИ.");
   }
 }
 

@@ -52,19 +52,19 @@ const App: React.FC = () => {
     setIsProcessing(true);
     setError(null);
     try {
-      const apiKey = process.env.API_KEY || (import.meta as any).env.VITE_GEMINI_API_KEY;
+      const apiKey = process.env.API_KEY;
       if (!apiKey) throw new Error("API Key missing");
       const ai = new GoogleGenAI({ apiKey });
       
       const instruction = mode === 'short' ? YOUTUBE_PROMPT_SHORT : YOUTUBE_PROMPT_DETAILED;
-      const content = transcript ? `Transcript: ${transcript}\nURL: ${url}` : `Video URL: ${url}`;
+      const content = transcript ? `Текст видео: ${transcript}\nURL: ${url}` : `Видео для анализа: ${url}`;
       
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: content,
         config: {
           systemInstruction: instruction,
-          tools: [{ googleSearch: {} }] // Allows Gemini to fetch info about the video if possible
+          tools: [{ googleSearch: {} }]
         }
       });
       setGeneratedContent(response.text || "");
